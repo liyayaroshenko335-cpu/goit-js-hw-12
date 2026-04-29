@@ -4,6 +4,9 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const galleryContainer = document.querySelector('.gallery');
 const loaderElement = document.querySelector('.loader');
 
+// 1. Додаємо вибір кнопки Load More
+const loadMoreBtn = document.querySelector('.load-more');
+
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
@@ -11,8 +14,7 @@ const lightbox = new SimpleLightbox('.gallery a', {
 
 export function createGallery(images) {
   const markup = images
-    .map(
-      img => `
+    .map(img => `
       <li class="gallery-item">
         <a class="gallery-link" href="${img.largeImageURL}">
           <img class="gallery-image" src="${img.webformatURL}" alt="${img.tags}" />
@@ -23,18 +25,14 @@ export function createGallery(images) {
             <div class="info-item"><b>Downloads</b><span>${img.downloads}</span></div>
           </div>
         </a>
-      </li>`
-    )
+      </li>`)
     .join('');
 
-  // ПРАВИЛЬНО: використовуємо метод із параметром 'beforeend'
   galleryContainer.insertAdjacentHTML('beforeend', markup);
-
   lightbox.refresh();
 }
 
 export function clearGallery() {
-  // ПРАВИЛЬНО: для повного очищення використовуємо innerHTML
   galleryContainer.innerHTML = '';
 }
 
@@ -44,4 +42,13 @@ export function showLoader() {
 
 export function hideLoader() {
   loaderElement.classList.add('hidden');
+}
+
+// 2. Додаємо та ЕКСПОРТУЄМО нові функції для кнопки
+export function showLoadMoreBtn() {
+  loadMoreBtn.classList.remove('hidden');
+}
+
+export function hideLoadMoreBtn() {
+  loadMoreBtn.classList.add('hidden');
 }

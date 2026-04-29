@@ -4,6 +4,8 @@ import {
   clearGallery,
   showLoader,
   hideLoader,
+  showLoadMoreBtn, // Додано обов'язковий імпорт
+  hideLoadMoreBtn, // Додано обов'язковий імпорт
 } from './js/render-functions.js';
 
 import iziToast from 'izitoast';
@@ -16,7 +18,6 @@ const form = document.querySelector('.form');
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
-
   currentQuery = event.currentTarget.elements['search-text'].value.trim();
 
   if (currentQuery === '') {
@@ -25,54 +26,63 @@ form.addEventListener('submit', async event => {
   }
 
   currentPage = 1;
-  loadMoreBtn.classList.add('hidden');
+  hideLoadMoreBtn(); 
   clearGallery();
   showLoader();
 
   try {
     const data = await getImagesByQuery(currentQuery, currentPage);
-
+    
     if (data.hits.length === 0) {
-      iziToast.error({ message: 'Sorry, no images found!' });
+      iziToast.error({ 
+        message: 'Sorry, there are no images matching your search query. Please try again!' 
+      });
       return;
     }
 
     createGallery(data.hits);
 
-    if (data.totalHits > 15) {
-      loadMoreBtn.classList.remove('hidden');
+    const totalPages = Math.ceil(data.totalHits / 15);
+
+    if (totalPages > 1) {
+      showLoadMoreBtn();
+    } else {
+      iziToast.info({ message: "You've reached the end of search results." });
     }
   } catch (error) {
-    iziToast.error({ message: 'Error fetching images!' });
+    iziToast.error({ message: 'Something went wrong. Please try again later.' });
+    console.error(error);
   } finally {
     hideLoader();
     form.reset();
   }
 });
 
+// ЗАЛИШАЄМО ТІЛЬКИ ОДИН ОБРОБНИК ДЛЯ КНОПКИ
 loadMoreBtn.addEventListener('click', async () => {
   currentPage += 1;
   showLoader();
-  loadMoreBtn.classList.add('hidden');
+  hideLoadMoreBtn(); 
 
   try {
     const data = await getImagesByQuery(currentQuery, currentPage);
     createGallery(data.hits);
 
     const totalPages = Math.ceil(data.totalHits / 15);
+    
     if (currentPage >= totalPages) {
-      iziToast.info({ message: "You've reached the end of search results." });
+      iziToast.info({
+        message: "We're sorry, but you've reached the end of search results.",
+      });
+      // Кнопка не показується, бо ми не викликаємо showLoadMoreBtn()
     } else {
-      loadMoreBtn.classList.remove('hidden');
+      showLoadMoreBtn(); 
     }
 
     // Плавний скрол після додавання нових фото
     const galleryItem = document.querySelector('.gallery-item');
     if (galleryItem) {
-      // Отримуємо висоту ОДНІЄЇ картки
       const cardHeight = galleryItem.getBoundingClientRect().height;
-
-      // Прокручуємо на ДВІ висоти картки
       window.scrollBy({
         top: cardHeight * 2,
         behavior: 'smooth',
