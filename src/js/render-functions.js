@@ -4,7 +4,6 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const galleryContainer = document.querySelector('.gallery');
 const loaderElement = document.querySelector('.loader');
 
-// Ініціалізуємо Lightbox один раз
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
@@ -28,13 +27,14 @@ export function createGallery(images) {
     )
     .join('');
 
-  galleryContainer.innerHTML = markup;
+  // ПРАВИЛЬНО: використовуємо метод із параметром 'beforeend'
+  galleryContainer.insertAdjacentHTML('beforeend', markup);
 
-  // Оновлюємо вміст галереї для Lightbox
   lightbox.refresh();
 }
 
 export function clearGallery() {
+  // ПРАВИЛЬНО: для повного очищення використовуємо innerHTML
   galleryContainer.innerHTML = '';
 }
 

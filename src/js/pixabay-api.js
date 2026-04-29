@@ -21,7 +21,7 @@
 
 import axios from 'axios';
 
-export async function getImagesByQuery(query) {
+export async function getImagesByQuery(query, page = 1) {
   const response = await axios.get('https://pixabay.com/api/', {
     params: {
       key: '55626104-ba3f0d0514f6dfab3319c84ea',
@@ -29,6 +29,8 @@ export async function getImagesByQuery(query) {
       image_type: 'photo',
       orientation: 'horizontal',
       safesearch: true,
+      page: page, // Номер сторінки, яку запитуємо
+      per_page: 15,
     },
   });
   return response.data;
